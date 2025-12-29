@@ -1,0 +1,138 @@
+$(document).ready(function() {
+
+    // Toggle chat menu
+    function toggleChatMenu() {
+        const $chatMenu = $('#chatMenu');
+        const $mainBtn = $('#mainChatBtn');
+        const $chatIcon = $('#chatIcon');
+
+        // Sử dụng .toggleClass() để đơn giản hóa logic if/else cho class
+        // và .hasClass() để kiểm tra trạng thái nếu cần xử lý phức tạp hơn
+        if ($chatMenu.hasClass('active')) {
+            $chatMenu.removeClass('active');
+            $mainBtn.removeClass('active');
+            $chatIcon.removeClass('fa-times').addClass('fa-comments');
+        } else {
+            $chatMenu.addClass('active');
+            $mainBtn.addClass('active');
+            $chatIcon.removeClass('fa-comments').addClass('fa-times');
+        }
+    }
+
+
+    const check = () => $(window).width() <= 768 ? $('.button_add').appendTo('.navbar-nav') : null;
+    check();
+    $(window).on('resize', check);
+
+
+    const backToTopButton = $('#back-to-top');
+    const scrollTrigger = 300; // Khoảng cách cuộn (pixels) để nút xuất hiện
+
+    // 1. Logic Hiển thị/Ẩn nút
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > scrollTrigger) {
+            backToTopButton.addClass('show');
+        } else {
+            backToTopButton.removeClass('show');
+        }
+    });
+
+    // 2. Logic Xử lý Cuộn trang
+    backToTopButton.on('click', function(e) {
+        e.preventDefault();
+        $('html, body').animate({
+            scrollTop: 0
+        }, 600); // Tốc độ cuộn 600ms
+        return false;
+    });
+
+    // Gán sự kiện click cho nút chính
+    $('#mainChatBtn').on('click', toggleChatMenu);
+
+
+    // Open WeChat modal
+    function openWeChatModal() {
+        $('#wechatModal').addClass('active');
+        // jQuery: dùng .css() để set style
+        $('body').css('overflow', 'hidden');
+    }
+
+    // Close WeChat modal
+    function closeWeChatModal() {
+        $('#wechatModal').removeClass('active');
+        $('body').css('overflow', 'auto');
+    }
+
+
+    // Gán sự kiện cho các thành phần
+    // Giả sử có nút/phần tử nào đó gọi openWeChatModal()
+    // Ví dụ: $('#openWechatButton').on('click', openWeChatModal);
+
+
+    // Close modal when clicking outside
+    $('#wechatModal').on('click', function(e) {
+        // Kiểm tra xem phần tử được click có phải là chính modal (this) không
+        if (e.target === this) {
+            closeWeChatModal();
+        }
+    });
+
+    // Close menu when clicking outside
+    $(document).on('click', function(e) {
+        const $chatContainer = $('.chat-container');
+        // .closest() không cần thiết vì ta muốn kiểm tra xem click có nằm TRONG container không
+        // Dùng !$.contains(container, target) để kiểm tra click bên ngoài
+        if (!$chatContainer.is(e.target) && !$chatContainer.has(e.target).length) {
+            // Kiểm tra click bên ngoài phần tử chat-container
+
+            const $chatMenu = $('#chatMenu');
+            const $mainBtn = $('#mainChatBtn');
+            const $chatIcon = $('#chatIcon');
+
+            // Chỉ đóng menu nếu nó đang mở
+            if ($chatMenu.hasClass('active')) {
+                $chatMenu.removeClass('active');
+                $mainBtn.removeClass('active');
+                $chatIcon.removeClass('fa-times').addClass('fa-comments');
+            }
+        }
+    });
+
+    // Close modal with Escape key
+    $(document).on('keydown', function(e) {
+        // e.which === 27 là mã của phím Escape
+        if (e.key === 'Escape') {
+            closeWeChatModal();
+        }
+    });
+
+
+    const filterBody = $('#filter-body');
+    const filterHeader = $('#filter-header');
+    const toggleIcon = $('#toggle-icon');
+
+    // --- 1. LOGIC CLICK để chuyển đổi trạng thái Collapse ---
+    filterHeader.on('click', function() {
+        filterBody.collapse('toggle');
+    });
+
+    // --- 2. LẮNG NGHE SỰ KIỆN CỦA BOOTSTRAP (KHI NỘI DUNG ĐÃ MỞ) ---
+    filterBody.on('shown.bs.collapse', function () {
+        // Thêm class 'rotated' để xoay icon về 0 độ (hướng xuống)
+        toggleIcon.addClass('rotated');
+        filterHeader.attr('aria-expanded', 'true');
+    });
+
+    // --- 3. LẮNG NGHE SỰ KIỆN CỦA BOOTSTRAP (KHI NỘI DUNG ĐÃ ĐÓNG) ---
+    filterBody.on('hidden.bs.collapse', function () {
+        // Xóa class 'rotated' để icon quay lại -90 độ (hướng ngang)
+        toggleIcon.removeClass('rotated');
+        filterHeader.attr('aria-expanded', 'false');
+    });
+
+    // Lưu ý: Không cần thiết lập transform ban đầu bằng JS
+    // vì chúng ta đã thiết lập transform: rotate(-90deg) trong CSS.
+
+
+
+});
